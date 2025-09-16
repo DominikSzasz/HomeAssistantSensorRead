@@ -1,0 +1,8 @@
+<div class="container">
+    <div class="row">
+        <div [ngClass]="{ 'cell-wide': (i == 3 && widen)}"  class="cell" *ngFor="let cell of titles; let i = index"><b>{{cell}}</b></div>
+    </div>
+    <div class="row" *ngFor="let t of table">
+        <div [ngClass]="{ 'cell-wide': (i == 3 && widen)}" class="cell" *ngFor="let cell of t; let i = index">{{cell}}</div>
+    </div>
+</div>

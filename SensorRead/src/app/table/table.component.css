@@ -1,0 +1,31 @@
+.container {
+  /* container can be any size; no height limits needed here */
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0px;
+  /* keep or remove wrap depending on layout needs */
+  flex-wrap: wrap; /* optional */
+} /* [19][5] */
+
+.cell {
+  background-color: lightgray;
+  border: 0.5px solid grey;
+  padding: 5px;
+  width: 200px;
+
+  /* limit cell height and make the inside scroll vertically */
+  max-height: 50px;
+  overflow-y: auto;
+  overflow-x: hidden; /* avoid horizontal scrollbar */
+  
+  /* ensure text wraps within the cell */
+  white-space: normal;
+  overflow-wrap: anywhere; /* break long words/URLs if needed */
+  word-break: break-word;  /* fallback behavior for older engines */
+} /* [5][2][12][9] */
+.cell-wide {
+  width: 700px; /* example for a wider cell */
+}
