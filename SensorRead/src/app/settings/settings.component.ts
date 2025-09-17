@@ -13,7 +13,7 @@ const fmt = new Intl.DateTimeFormat('hu-HU', {
 export class SettingsComponent {
 private sortByValidAtAsc = (a: { validAt: number }, b: { validAt: number }) =>
   a.validAt - b.validAt; // ascending; flip for desc [14]
-  url = "https://e3429f9f0ad5.ngrok-free.app/settings"
+  url = "http://szp.cwskft.hu:8002/settings"
   sort = false;
 table: (string | number)[][] = [];
 titles = ["deviceId", "validAt", "name", "value"]

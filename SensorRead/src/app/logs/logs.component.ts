@@ -13,7 +13,7 @@ const fmt = new Intl.DateTimeFormat('hu-HU', {
 export class LogsComponent {
 private sortByValidAtAsc = (a: { validAt: number }, b: { validAt: number }) =>
   a.validAt - b.validAt; // ascending; flip for desc [14]
-  url = "https://e3429f9f0ad5.ngrok-free.app/logs"
+  url = "http://szp.cwskft.hu:8002/logs"
   sort = false;
 table: (string | number)[][] = [];
 titles = ["deviceId", "recievedAt", "logLevel", "logMsg"]

@@ -33,7 +33,7 @@ export class ValuesComponent {
 
   private sortByValidAtAsc = (a: { validAt: number }, b: { validAt: number }) =>
   a.validAt - b.validAt; // ascending; flip for desc [14]
-  url = "https://e3429f9f0ad5.ngrok-free.app/values"
+  url = "http://szp.cwskft.hu:8002/values"
   sort = false;
 table: (string | number)[][] = [];
 titles = ["deviceId", "receivedAt", "validAt", "valueType", "value"]
