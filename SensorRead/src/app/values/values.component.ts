@@ -13,22 +13,32 @@ const fmt = new Intl.DateTimeFormat('hu-HU', {
   styleUrl: './values.component.css'
 })
 export class ValuesComponent {
-  ms1: number | null = null;
-  ms2: number | null = null;
-  formatDateTimeLocal(ms: number | null): string {
-  if (!Number.isFinite(ms as number)) return '';
-  // Produce "YYYY-MM-DDTHH:MM" in local time for <input type="datetime-local">
-  const d = new Date(ms as number);
-  const pad = (n: number) => n.toString().padStart(2, '0');
+  fromMs: number | null = null;
+  toMs: number | null = null;
 
-  const year = d.getFullYear();
-  const month = pad(d.getMonth() + 1);
-  const day = pad(d.getDate());
-  const hours = pad(d.getHours());
-  const minutes = pad(d.getMinutes());
+  // Accepts the raw datetime-local strings and converts to epoch ms
+  capture(fromISO: string, toISO: string, deviceId: string) {
+    this.fromMs = fromISO ? new Date(fromISO).getTime() : null;
+    this.toMs = toISO ? new Date(toISO).getTime() : null;
+    console.log(`fromMs: ${this.fromMs}, toMs: ${this.toMs}`);
+    if ((this.fromMs == null || this.toMs == null) && deviceId === "") {
+      this.getBaseData();
+      return;
+    }
+    else if (deviceId === "" && (this.fromMs !== null || this.toMs !== null)) {
+      this.getDateFilteredData(this.fromMs ?? 0, this.toMs ?? 0);
+      return;
+    }
+    else if (deviceId !== "" && (this.fromMs == null || this.toMs == null)) {
+      this.getFilteredData(deviceId);
+      return;
+    }
+    else {
+      this.getDateIdFilteredData(this.fromMs, this.toMs, deviceId);
+      return;
+    }
 
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
+  }
 
 
   private sortByValidAtAsc = (a: { validAt: number }, b: { validAt: number }) =>
@@ -132,16 +142,56 @@ async getFilteredData(deviceId:string) {
     console.error(e);
   }
 }
-async getDateFilteredData() {
-      console.log(this.url + "/date/" + this.ms1 + "/" + this.ms2)
+async getDateFilteredData(ms1:number, ms2:number) {
+      console.log(this.url + "/date/" + ms1 + "/" + ms2)
 
   try {
-    if (0 === this.ms1 || 0 === this.ms2) {
+    if (0 === ms1 || 0 === ms2) {
       this.getBaseData();
       return;
     }
-    console.log(this.url + "/date/" + this.ms1 + "/" + this.ms2)
-    const res = await fetch(this.url + "/date/" + this.ms1 + "/" + this.ms2, {
+    console.log(this.url + "/date/" + ms1 + "/" + ms2)
+    const res = await fetch(this.url + "/date/" + ms1 + "/" + ms2, {
+      method: "GET",
+      headers: { "ngrok-skip-browser-warning": "true" },
+      credentials: "include",
+    });
+    const data: {
+      deviceId: string;
+      valueType: string;
+      value: number;
+      receivedAt: number;
+      validAt: number;
+    }[] = await res.json();
+    if (this.sort)
+    {
+          data.sort(this.sortByValidAtAsc);
+    }
+    this.table = data.map(
+  ({ deviceId, receivedAt, validAt, valueType, value }: {
+    deviceId: string; valueType: string; value: number; receivedAt: number; validAt: number;
+  }): (string | number)[] => [
+    deviceId,
+    fmt.format(new Date(receivedAt)), // or fmt.format(new Date(receivedAt))
+    fmt.format(new Date(validAt)),    // string fits your (string|number)[]
+    valueType,
+    value,
+  ]
+);
+
+  } catch (e) {
+    console.error(e);
+  }
+}
+async getDateIdFilteredData(ms1:number | null, ms2:number | null, deviceId:string)
+{
+try {
+    if (0 === ms1 || 0 === ms2) {
+      this.getBaseData();
+      return;
+    }
+    console.log(this.url + "/dateid/date/" + ms1 + "/" + ms2 + "/id/" + deviceId)
+    const res = await fetch(this.url + "/dateid/date/" + ms1 + "/" + ms2 + "/id/" + deviceId, {
       method: "GET",
       headers: { "ngrok-skip-browser-warning": "true" },
       credentials: "include",

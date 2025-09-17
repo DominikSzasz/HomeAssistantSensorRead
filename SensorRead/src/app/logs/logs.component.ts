@@ -11,6 +11,32 @@ const fmt = new Intl.DateTimeFormat('hu-HU', {
   styleUrl: './logs.component.css'
 })
 export class LogsComponent {
+  fromMs: number | null = null;
+  toMs: number | null = null;
+
+  // Accepts the raw datetime-local strings and converts to epoch ms
+  capture(fromISO: string, toISO: string, deviceId: string) {
+    this.fromMs = fromISO ? new Date(fromISO).getTime() : null;
+    this.toMs = toISO ? new Date(toISO).getTime() : null;
+    console.log(`fromMs: ${this.fromMs}, toMs: ${this.toMs}`);
+    if ((this.fromMs == null || this.toMs == null) && deviceId === "") {
+      this.getBaseData();
+      return;
+    }
+    else if (deviceId === "" && (this.fromMs !== null || this.toMs !== null)) {
+      this.getDateFilteredData(this.fromMs ?? 0, this.toMs ?? 0);
+      return;
+    }
+    else if (deviceId !== "" && (this.fromMs == null || this.toMs == null)) {
+      this.getFilteredData(deviceId);
+      return;
+    }
+    else {
+      this.getDateIdFilteredData(this.fromMs, this.toMs, deviceId);
+      return;
+    }
+
+  }
 private sortByValidAtAsc = (a: { validAt: number }, b: { validAt: number }) =>
   a.validAt - b.validAt; // ascending; flip for desc [14]
   url = "http://szp.cwskft.hu:8002/logs"
@@ -75,6 +101,75 @@ async getFilteredData(deviceId:string) {
       return;
     }
     const res = await fetch(this.url + "/id/" + deviceId, {
+      method: "GET",
+      headers: { "ngrok-skip-browser-warning": "true" },
+      credentials: "include",
+    });
+    const data: {
+      deviceId: string;
+      receivedAt: number;
+      logLevel: string;
+      logMsg: string;
+    }[] = await res.json();
+    this.table = data.map(
+  ({ deviceId, receivedAt, logLevel, logMsg }: {
+    deviceId: string; receivedAt: number; logLevel: string; logMsg: string;
+  }): (string | number)[] => [
+    deviceId,
+    fmt.format(new Date(receivedAt)), // or fmt.format(new Date(receivedAt))
+    logLevel,
+    logMsg,
+  ]
+);
+
+  } catch (e) {
+    console.error(e);
+  }
+}
+async getDateFilteredData(ms1:number, ms2:number) {
+      console.log(this.url + "/date/" + ms1 + "/" + ms2)
+
+  try {
+    if (0 === ms1 || 0 === ms2) {
+      this.getBaseData();
+      return;
+    }
+    console.log(this.url + "/date/" + ms1 + "/" + ms2)
+    const res = await fetch(this.url + "/date/" + ms1 + "/" + ms2, {
+      method: "GET",
+      headers: { "ngrok-skip-browser-warning": "true" },
+      credentials: "include",
+    });
+    const data: {
+      deviceId: string;
+      receivedAt: number;
+      logLevel: string;
+      logMsg: string;
+    }[] = await res.json();
+    this.table = data.map(
+  ({ deviceId, receivedAt, logLevel, logMsg }: {
+    deviceId: string; receivedAt: number; logLevel: string; logMsg: string;
+  }): (string | number)[] => [
+    deviceId,
+    fmt.format(new Date(receivedAt)), // or fmt.format(new Date(receivedAt))
+    logLevel,
+    logMsg,
+  ]
+);
+
+  } catch (e) {
+    console.error(e);
+  }
+}
+async getDateIdFilteredData(ms1:number | null, ms2:number | null, deviceId:string)
+{
+try {
+    if (0 === ms1 || 0 === ms2) {
+      this.getBaseData();
+      return;
+    }
+    console.log(this.url + "/dateid/date/" + ms1 + "/" + ms2 + "/id/" + deviceId)
+    const res = await fetch(this.url + "/dateid/date/" + ms1 + "/" + ms2 + "/id/" + deviceId, {
       method: "GET",
       headers: { "ngrok-skip-browser-warning": "true" },
       credentials: "include",

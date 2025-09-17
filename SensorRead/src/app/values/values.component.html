@@ -1,24 +1,12 @@
 <div style="margin: 25px;">
     <span style="font-size: 30px; font-weight: 800; margin-right: 50px; " >Values Database</span>
     <button class="downloadcsv" (click)="downloadCSV()">Download CSV</button>
-    <button (click)="getBaseData()">Get Unfiltered Data</button>
+
     <input #id type="text" placeholder="Device ID" />
-        <button (click)="getFilteredData(id.value)">Get Filtered Data</button>
-    <input
-  type="datetime-local"
-  [value]="formatDateTimeLocal(ms1)"
-  (input)="ms1 = dt1.valueAsNumber"
-  #dt1
-/>
-
-<input
-  type="datetime-local"
-  [value]="formatDateTimeLocal(ms2)"
-  (input)="ms2 = dt2.valueAsNumber"
-  #dt2
-/>
-
-    <button (click)="getDateFilteredData()">Get Date Filtered Data</button>
+        <!-- <button (click)="getFilteredData(id.value)">Get Filtered Data</button> -->
+    <input type="datetime-local" #fromDt step="1">
+    <input type="datetime-local" #toDt step="1">
+    <button (click)="capture(fromDt.value, toDt.value, id.value)">Save</button>
 
 
 
